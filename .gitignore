@@ -1,0 +1,61 @@
+# 构建产物
+*.zip
+lambda_*_package/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+
+# 依赖库（不上传，通过 pip install 安装）
+boto3/
+botocore/
+google/
+grpc/
+grpc_status/
+googleapiclient/
+requests/
+urllib3/
+s3transfer/
+jmespath/
+dateutil/
+proto/
+pydantic/
+pydantic_core/
+pyasn1/
+pyasn1_modules/
+httplib2/
+idna/
+certifi/
+charset_normalizer/
+tqdm/
+rsa/
+pyparsing/
+
+# 独立依赖文件
+six.py
+typing_extensions.py
+google_auth_httplib2.py
+
+# dist-info 元数据
+*.dist-info/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 环境变量（敏感信息）
+.env
+.env.local
+
