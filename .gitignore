@@ -59,3 +59,6 @@ Thumbs.db
 .env
 .env.local
 
+# Agent Harness 运行产物
+agent_harness/runs/*
+!agent_harness/runs/.gitkeep

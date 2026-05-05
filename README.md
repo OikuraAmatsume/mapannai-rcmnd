@@ -23,9 +23,81 @@
                      └─────────────┘
 ```
 
+## 🧠 开发 Agent Harness
+
+上面的 Lambda A / B / C 是**线上业务执行链**，不等同于后续开发时要使用的 Agent Harness。
+
+仓库内新增了一套 `agent_harness/`，用于把“未来所有代码改动”固定为下面这条开发链路：
+
+```
+用户意图
+  │
+  ▼
+Agent1 (独立 context, 只拆意图和出 prompt)
+  │  输出：可执行 prompt / 更优方案问题 / 验收标准
+  ▼
+Agent2 (独立 context, 只按 prompt 改代码)
+  │  输出：代码改动
+  ▼
+git commit
+  │
+  ▼
+Agent3 (独立 context, 先产出 review 要点，再审查 Agent2 结果)
+  │  检查：
+  │  1. 继续坚持无数据库设计
+  │  2. 所有新增持久化和中间状态继续落在当前指定 S3
+  ▼
+不通过 → 自动返工 → git commit → Agent3 复检
+```
+
+### 目录说明
+
+```text
+agent_harness/
+├── config.json                  # 项目级硬约束、模型和 git 约定
+├── runner.py                    # Harness 编排入口
+├── README.md                    # 使用说明
+├── schemas/                     # Agent1 / Agent3 结构化输出约束
+├── templates/                   # 三个 Agent 的提示词模板
+└── runs/                        # 每次执行的本地工件目录（默认不纳入 git）
+```
+
+### 独立 context 的实现方式
+
+- 每个 Agent 都通过独立的 `codex exec --ephemeral` 进程启动
+- Agent 之间只通过 `agent_harness/runs/<run_id>/` 下的工件文件传递信息
+- Agent2 和 Agent3 不会继承 Agent1 的对话上下文，只消费显式输入
+
+### 推荐使用方式
+
+1. 先生成 Prompt，不直接改代码：
+
+```bash
+python3 agent_harness/runner.py prepare --intent "你的改动目标"
+```
+
+2. 如果 Agent1 提出了更优方案问题，先回答它：
+
+```bash
+python3 agent_harness/runner.py answer --run-id <run_id> --text "你的补充说明"
+```
+
+3. 确认最终 Prompt 后，再执行 Agent2 + Agent3：
+
+```bash
+python3 agent_harness/runner.py execute --run-id <run_id>
+```
+
+4. 随时查看当前 run 状态：
+
+```bash
+python3 agent_harness/runner.py status --run-id <run_id>
+```
+
 ## 📁 文件结构
 
 ```
+├── agent_harness/               # 开发 Agent Harness（与业务 Lambda 链分离）
 ├── recommendation_generator.py  # 核心推荐逻辑
 ├── config.py                    # 配置管理
 ├── lambda_a_starter.py          # Lambda A - 启动器
@@ -132,4 +204,4 @@ GET /status/{jobId}
 - **Prompt Engineering**：角色设定、结构化输出、字数约束
 - **类 RAG 模式**：检索评论数据 → Gemini 生成概述
 - **Structured Output**：JSON Schema 约束输出格式
-
+- **Agent Harness**：Agent1 拆意图，Agent2 改代码，Agent3 审查并兜底无数据库 / S3 约束

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "passed",
+    "summary",
+    "review_checklist",
+    "constraint_checks",
+    "findings",
+    "rework_prompt_markdown"
+  ],
+  "properties": {
+    "passed": {
+      "type": "boolean"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "review_checklist": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constraint_checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "no_database_design_passed",
+        "s3_only_persistence_passed",
+        "notes"
+      ],
+      "properties": {
+        "no_database_design_passed": {
+          "type": "boolean"
+        },
+        "s3_only_persistence_passed": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "severity",
+          "title",
+          "details"
+        ],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rework_prompt_markdown": {
+      "type": "string"
+    }
+  }
+}

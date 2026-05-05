@@ -1,0 +1,53 @@
+{
+  "project_name": "mapannai-rcmnd",
+  "project_root": ".",
+  "codex": {
+    "agent1_model": "gpt-5.4",
+    "agent2_model": "gpt-5.4",
+    "agent3_model": "gpt-5.4"
+  },
+  "git": {
+    "require_clean_worktree": true,
+    "commit_prefix": "harness"
+  },
+  "execution": {
+    "max_rework_rounds": 1
+  },
+  "guardrails": {
+    "hard_rules": [
+      "必须坚持无数据库设计，禁止引入 SQL、NoSQL、ORM、嵌入式数据库或缓存数据库作为持久化方案。",
+      "所有新增的持久化、任务状态、缓存和中间结果都必须继续存放到当前项目指定的 S3 中，不能改为数据库或本地持久化。",
+      "如需新增存储 key，必须沿用当前项目的 S3 bucket（Config.S3_BUCKET_NAME）并使用清晰前缀。"
+    ],
+    "design_context": [
+      "当前项目已使用 S3 保存 poi-images/ 和 rcmnd_job/ 下的数据。",
+      "线上 Lambda A/B/C 是业务执行链；Agent Harness 是开发阶段的编排链，两者职责分离。"
+    ],
+    "disallowed_database_patterns": [
+      "sqlite3",
+      "sqlalchemy",
+      "create_engine(",
+      "sessionmaker(",
+      "postgresql://",
+      "postgres://",
+      "mysql://",
+      "mongodb://",
+      "motor.motor_asyncio",
+      "pymysql",
+      "psycopg",
+      "psycopg2",
+      "asyncpg",
+      "redis.Redis",
+      "aioredis",
+      "DATABASE_URL",
+      "DB_HOST",
+      "DB_PORT",
+      "DB_NAME",
+      "DB_USER",
+      "DB_PASSWORD",
+      "boto3.client('dynamodb')",
+      "boto3.resource('dynamodb')",
+      "dynamodb"
+    ]
+  }
+}
